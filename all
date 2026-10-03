@@ -1,0 +1,202 @@
+1. Caesar Cipher — Package Based
+from pycipher import Caesar
+
+plaintext = input("Enter plaintext: ")
+key = int(input("Enter key: "))
+
+cipher = Caesar(key)
+
+encrypted = cipher.encipher(plaintext)
+decrypted = cipher.decipher(encrypted)
+
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+Example:
+
+Enter plaintext: HELLO
+Enter key: 3
+
+Encrypted: KHOOR
+Decrypted: HELLO
+2. Playfair Cipher — Package Based
+from pycipher import Playfair
+
+key = input("Enter key: ")
+plaintext = input("Enter plaintext: ")
+
+cipher = Playfair(key)
+
+encrypted = cipher.encipher(plaintext)
+decrypted = cipher.decipher(encrypted)
+
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+Example:
+
+Enter key: MONARCHY
+Enter plaintext: INSTRUMENTS
+
+Encrypted: GATLMZCLRQXA
+Decrypted: INSTRUMENTSX
+
+The X can appear as the Playfair filler character.
+
+3. Hill Cipher — Package Based
+from pycipher import Hill
+
+key = input("Enter key matrix: ")
+
+plaintext = input("Enter plaintext: ")
+
+cipher = Hill(key)
+
+encrypted = cipher.encipher(plaintext)
+decrypted = cipher.decipher(encrypted)
+
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+However, pycipher.Hill expects its key in a particular format. For a college lab, this can be annoying because the matrix/key format depends on the package version.
+
+A typical 2×2 Hill key is:
+
+3 3
+2 5
+
+If your professor expects a 2×2 matrix specifically, I'd actually recommend the NumPy version I gave you earlier because it's considerably more reliable than depending on the pycipher API.
+
+4. Rail Fence Cipher — Package Based
+from pycipher import Railfence
+
+plaintext = input("Enter plaintext: ")
+rails = int(input("Enter number of rails: "))
+
+cipher = Railfence(rails)
+
+encrypted = cipher.encipher(plaintext)
+decrypted = cipher.decipher(encrypted)
+
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+5. Row Transposition Cipher
+
+For this one, package APIs are inconsistent, so here's a compact package-style implementation using pycipher's transposition functionality where available:
+
+from pycipher import ColTrans
+
+plaintext = input("Enter plaintext: ")
+key = input("Enter key: ")
+
+cipher = ColTrans(key)
+
+encrypted = cipher.encipher(plaintext)
+decrypted = cipher.decipher(encrypted)
+
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+6. Column Transposition Cipher
+from pycipher import ColTrans
+
+plaintext = input("Enter plaintext: ")
+key = input("Enter key: ")
+
+cipher = ColTrans(key)
+
+encrypted = cipher.encipher(plaintext)
+decrypted = cipher.decipher(encrypted)
+
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+For example:
+
+Key: 3142
+7. DES — PyCryptodome
+
+This is the proper package approach.
+
+from Crypto.Cipher import DES
+from Crypto.Util.Padding import pad, unpad
+
+key = b"12345678"
+
+plaintext = input("Enter plaintext: ").encode()
+
+cipher = DES.new(key, DES.MODE_ECB)
+
+encrypted = cipher.encrypt(
+    pad(plaintext, DES.block_size)
+)
+
+print("Encrypted:", encrypted.hex())
+
+cipher = DES.new(key, DES.MODE_ECB)
+
+decrypted = unpad(
+    cipher.decrypt(encrypted),
+    DES.block_size
+)
+
+print("Decrypted:", decrypted.decode())
+8. AES — PyCryptodome
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+
+key = b"1234567890123456"
+
+plaintext = input("Enter plaintext: ").encode()
+
+cipher = AES.new(key, AES.MODE_ECB)
+
+encrypted = cipher.encrypt(
+    pad(plaintext, AES.block_size)
+)
+
+print("Encrypted:", encrypted.hex())
+
+cipher = AES.new(key, AES.MODE_ECB)
+
+decrypted = unpad(
+    cipher.decrypt(encrypted),
+    AES.block_size
+)
+
+print("Decrypted:", decrypted.decode())
+9. RSA — PyCryptodome
+
+Here we can use the package to generate the keys and perform RSA encryption/decryption.
+
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+
+# Generate RSA keys
+key = RSA.generate(2048)
+
+private_key = key
+public_key = key.publickey()
+
+print("Public Key:")
+print(public_key.export_key().decode())
+
+print("\nPrivate Key:")
+print(private_key.export_key().decode())
+
+
+# Encryption
+plaintext = input("\nEnter plaintext: ").encode()
+
+cipher = PKCS1_OAEP.new(public_key)
+
+encrypted = cipher.encrypt(plaintext)
+
+print("\nEncrypted:", encrypted.hex())
+
+
+# Decryption
+cipher = PKCS1_OAEP.new(private_key)
+
+decrypted = cipher.decrypt(encrypted)
+
+print("Decrypted:", decrypted.decode())
